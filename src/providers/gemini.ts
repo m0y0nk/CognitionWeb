@@ -10,8 +10,8 @@ import {
   GoogleGenerativeAI,
   Content,
   Part,
-  FunctionDeclarationSchemaType,
-  Tool as GeminiTool,
+  SchemaType,
+  FunctionDeclarationsTool,
   FunctionDeclaration,
 } from '@google/generative-ai';
 import { LLMProvider, ChatMessage, LLMResponse, ToolCall } from './base';
@@ -19,31 +19,31 @@ import { ToolDefinition } from '../types';
 import logger from '../logger';
 
 /**
- * Maps our simple type strings to Gemini's FunctionDeclarationSchemaType.
+ * Maps our simple type strings to Gemini's SchemaType.
  */
-function mapSchemaType(type: string): FunctionDeclarationSchemaType {
+function mapSchemaType(type: string): SchemaType {
   switch (type) {
     case 'string':
-      return FunctionDeclarationSchemaType.STRING;
+      return SchemaType.STRING;
     case 'number':
-      return FunctionDeclarationSchemaType.NUMBER;
+      return SchemaType.NUMBER;
     case 'boolean':
-      return FunctionDeclarationSchemaType.BOOLEAN;
+      return SchemaType.BOOLEAN;
     case 'object':
-      return FunctionDeclarationSchemaType.OBJECT;
+      return SchemaType.OBJECT;
     case 'array':
-      return FunctionDeclarationSchemaType.ARRAY;
+      return SchemaType.ARRAY;
     default:
-      return FunctionDeclarationSchemaType.STRING;
+      return SchemaType.STRING;
   }
 }
 
 /**
  * Convert our tool definitions to Gemini's function declaration format.
  */
-function convertToGeminiTools(tools: ToolDefinition[]): GeminiTool[] {
-  const functionDeclarations: FunctionDeclaration[] = tools.map((tool) => {
-    const properties: Record<string, { type: FunctionDeclarationSchemaType; description: string; enum?: string[] }> = {};
+function convertToGeminiTools(tools: ToolDefinition[]): FunctionDeclarationsTool[] {
+  const functionDeclarations = tools.map((tool) => {
+    const properties: Record<string, unknown> = {};
 
     for (const [key, param] of Object.entries(tool.parameters.properties)) {
       properties[key] = {
@@ -57,14 +57,14 @@ function convertToGeminiTools(tools: ToolDefinition[]): GeminiTool[] {
       name: tool.name,
       description: tool.description,
       parameters: {
-        type: FunctionDeclarationSchemaType.OBJECT,
+        type: SchemaType.OBJECT,
         properties,
         required: tool.parameters.required,
       },
     };
   });
 
-  return [{ functionDeclarations }];
+  return [{ functionDeclarations }] as unknown as FunctionDeclarationsTool[];
 }
 
 /**
@@ -103,7 +103,7 @@ function convertToGeminiMessages(messages: ChatMessage[]): { systemInstruction: 
     } else if (msg.role === 'tool') {
       // Gemini expects function responses as a specific format
       contents.push({
-        role: 'function',
+        role: 'function' as 'user',
         parts: [
           {
             functionResponse: {
