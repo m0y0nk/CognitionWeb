@@ -212,15 +212,3 @@ The agent handles errors at multiple levels:
 3. **Provider level** — API errors are caught with descriptive messages
 4. **Config level** — Missing API keys produce clear setup instructions
 5. **Process level** — SIGINT/SIGTERM trigger graceful browser cleanup
-
----
-
-## 📝 License
-
-MIT
-
----
-
-## 👤 Author
-
-**Mayank Soni** — [GitHub](https://github.com/m0y0nk)
