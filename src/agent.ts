@@ -148,12 +148,14 @@ export class AutomationAgent {
       });
 
       try {
-        // Smart Rate Limiting (15 RPM = 4s per request)
-        // We only wait the difference between the actual time elapsed and 4.2s
+        // Smart Rate Limiting based on config
+        // We only wait the difference between the actual time elapsed and the target delay
         const now = Date.now();
         const timeSinceLast = now - lastRequestTime;
-        if (lastRequestTime > 0 && timeSinceLast < 4200) {
-          const delayNeeded = 4200 - timeSinceLast;
+        const targetDelay = this.config.rateLimitDelayMs;
+        
+        if (lastRequestTime > 0 && targetDelay > 0 && timeSinceLast < targetDelay) {
+          const delayNeeded = targetDelay - timeSinceLast;
           logger.info(`Rate limit pause (${(delayNeeded / 1000).toFixed(1)}s)...`, { iteration });
           await new Promise((resolve) => setTimeout(resolve, delayNeeded));
         }

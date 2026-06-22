@@ -61,5 +61,6 @@ export function loadConfig(): AgentConfig {
     browserType,
     targetUrl: process.env.TARGET_URL || 'https://ui.shadcn.com/docs/forms/react-hook-form',
     maxIterations: parseInt(process.env.MAX_ITERATIONS || '25', 10),
+    rateLimitDelayMs: parseInt(process.env.RATE_LIMIT_DELAY_MS || '4200', 10),
   };
 }

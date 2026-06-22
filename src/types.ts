@@ -109,6 +109,7 @@ export interface AgentConfig {
   browserType: 'chromium' | 'firefox' | 'webkit';
   targetUrl: string;
   maxIterations: number;
+  rateLimitDelayMs: number;
 }
 
 /** Record of a single agent step (for logging) */
