@@ -78,7 +78,6 @@ export class AutomationAgent {
     logger.info('═══════════════════════════════════════════════════', {});
     logger.info('CognitionWeb Agent Starting', {});
     logger.info(`Provider: ${this.provider.name} | Vision: ${this.provider.supportsVision}`, {});
-    logger.info(`Target: ${this.config.targetUrl}`, {});
     logger.info(`Max Iterations: ${this.config.maxIterations}`, {});
     logger.info('═══════════════════════════════════════════════════', {});
 
@@ -91,7 +90,7 @@ export class AutomationAgent {
         { role: 'system', content: SYSTEM_PROMPT },
         {
           role: 'user',
-          content: `## Your Task\n${task}\n\nThe browser is already open and navigated to ${this.config.targetUrl}. Start by using get_page_info to understand the page, then complete the task.`,
+          content: `## Your Task\n${task}\n\nThe browser is already open but currently on a blank page. First, use the navigate_to_url tool to go to the website mentioned in the task. Then, use get_page_info to understand the page structure, and interact with the elements to complete your task.`,
         },
       ];
 
@@ -116,23 +115,12 @@ export class AutomationAgent {
   }
 
   /**
-   * Initialize the browser and navigate to the target URL.
+   * Initialize the browser. The agent will navigate to the target URL itself.
    */
   private async initialize(): Promise<void> {
     logger.info('Initializing browser...', {});
     this.page = await this.browserManager.launch();
-
-    logger.info(`Navigating to ${this.config.targetUrl}...`, {});
-    await this.page.goto(this.config.targetUrl, {
-      waitUntil: 'domcontentloaded',
-      timeout: 30000,
-    });
-
-    // Wait for page to settle
-    await this.page.waitForTimeout(3000);
-
-    const title = await this.page.title();
-    logger.info(`Page loaded: "${title}"`, {});
+    logger.info('Browser launched on blank page. Agent will navigate as needed.', {});
   }
 
   /**

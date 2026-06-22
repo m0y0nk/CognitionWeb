@@ -11,9 +11,8 @@ import { AutomationAgent } from './agent';
 import { getProviderInfo } from './providers';
 import logger from './logger';
 
-/** The default task the agent will perform */
 const DEFAULT_TASK = `
-Navigate to the form demo section on this page.
+Navigate to: https://ui.shadcn.com/docs/forms/react-hook-form
 Find the form with "Username" field (it may also be labeled "Name").
 Fill in the Username/Name field with: Mayank Soni
 You may also see a Bio/Description field — if present, fill it with: This form was filled by CognitionWeb, an AI-powered browser automation agent built with Playwright.
@@ -45,7 +44,6 @@ async function main(): Promise<void> {
     console.log(`  Model    : ${providerInfo.model}`);
     console.log(`  Vision   : ${providerInfo.supportsVision ? '✅ Enabled' : '❌ Disabled (using DOM analysis)'}`);
     console.log(`  Browser  : ${config.browserType} (${config.headless ? 'headless' : 'headful'})`);
-    console.log(`  Target   : ${config.targetUrl}`);
     console.log(`  Max Iter : ${config.maxIterations}`);
     console.log('');
 
