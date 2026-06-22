@@ -3,7 +3,7 @@
  *
  * LLM provider implementation using Google's Generative AI SDK.
  * Default provider — cheapest option with vision + function calling.
- * Model: gemini-2.0-flash
+ * Model: gemini-1.5-flash
  */
 
 import {
@@ -125,7 +125,7 @@ export class GeminiProvider implements LLMProvider {
   private client: GoogleGenerativeAI;
   private modelName: string;
 
-  constructor(apiKey: string, modelName: string = 'gemini-2.0-flash') {
+  constructor(apiKey: string, modelName: string = 'gemini-3.1-flash-lite') {
     this.client = new GoogleGenerativeAI(apiKey);
     this.modelName = modelName;
     logger.info(`Gemini provider initialized (model: ${modelName})`, { tool: 'GeminiProvider' });

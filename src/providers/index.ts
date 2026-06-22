@@ -55,9 +55,9 @@ export function getProviderInfo(name: LLMProviderName): {
   switch (name) {
     case 'gemini':
       return {
-        model: 'gemini-2.0-flash',
+        model: 'gemini-3.1-flash-lite',
         supportsVision: true,
-        description: 'Google Gemini Flash — Cheapest, with vision + function calling',
+        description: 'Google Gemini 3.1 Flash Lite — Best free tier quota (15 RPM)',
       };
     case 'groq':
       return {

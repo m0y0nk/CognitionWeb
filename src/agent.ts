@@ -47,10 +47,11 @@ You have access to the following tools:
 - Coordinates from get_page_info boundingBox: click the CENTER of the element (x + width/2, y + height/2)
 - If an element is not visible, scroll down first
 - If something fails, try an alternative approach before giving up
-- When your task is complete, respond with a clear summary of what you accomplished (do NOT call any more tools)
+- To call a tool, you MUST use the native tool/function calling API. Do NOT output tool calls as plain text.
+- When your task is complete, respond with a final message starting exactly with: "TASK COMPLETED:" (do NOT call any tools in your final response)
 
 ## Completion
-When you have finished the task, respond with a final message summarizing what you did. Do NOT call any tools in your final response.`;
+When you have finished the task, respond with a final message starting with "TASK COMPLETED:" and summarize what you did.`;
 
 /**
  * AutomationAgent — The core agent implementing the ReAct loop.
@@ -139,6 +140,7 @@ export class AutomationAgent {
    */
   private async agentLoop(): Promise<string> {
     const toolDefs = getToolDefinitions();
+    let lastRequestTime = 0;
 
     for (let iteration = 1; iteration <= this.config.maxIterations; iteration++) {
       logger.info(`\n──── Iteration ${iteration}/${this.config.maxIterations} ────`, {
@@ -146,11 +148,24 @@ export class AutomationAgent {
       });
 
       try {
+        // Smart Rate Limiting (15 RPM = 4s per request)
+        // We only wait the difference between the actual time elapsed and 4.2s
+        const now = Date.now();
+        const timeSinceLast = now - lastRequestTime;
+        if (lastRequestTime > 0 && timeSinceLast < 4200) {
+          const delayNeeded = 4200 - timeSinceLast;
+          logger.info(`Rate limit pause (${(delayNeeded / 1000).toFixed(1)}s)...`, { iteration });
+          await new Promise((resolve) => setTimeout(resolve, delayNeeded));
+        }
+        lastRequestTime = Date.now();
+
         // Send conversation to LLM
         const response = await this.provider.chat(this.conversationHistory, toolDefs);
 
-        // If the model is done (final answer, no tool calls), return
-        if (response.done || (response.toolCalls.length === 0 && response.content)) {
+        // If the model explicitly signals it is done, return the final message
+        const isDone = response.content && response.content.includes('TASK COMPLETED:');
+        
+        if (isDone) {
           const finalMessage = response.content || 'Task completed.';
           logger.info(`Agent finished: ${finalMessage.substring(0, 200)}`, { iteration });
 
