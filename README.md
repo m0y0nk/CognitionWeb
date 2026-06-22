@@ -17,12 +17,14 @@ CognitionWeb is a mini browser automation agent (inspired by [Browser Use](https
 4. **Interacts with elements** — clicks buttons, fills forms, scrolls pages
 5. **Iterates autonomously** until the task is complete
 
-### Target Task
+### Dynamic Tasks
 
-The agent navigates to [shadcn/ui React Hook Form demo](https://ui.shadcn.com/docs/forms/react-hook-form) and:
-- Identifies the form fields (Username/Name, Bio/Description)
-- Fills in the fields with specified values
-- Submits the form
+The agent is completely dynamic. It launches on a blank page and uses its `navigate_to_url` tool to reach whichever destination you specify in your prompt.
+
+For example:
+- "Navigate to shadcn/ui and fill out the React Hook form"
+- "Go to google.com and search for kittens"
+- "Open github.com and find the trending repositories"
 
 ---
 
@@ -56,7 +58,7 @@ The agent supports **3 LLM providers** via a pluggable abstraction layer. Switch
 
 | Provider | Model | Vision | Function Calling | Cost (Input) | Default |
 |:---|:---|:---:|:---:|:---|:---:|
-| **Google Gemini** | `gemini-2.0-flash` | ✅ | ✅ | ~$0.10/1M tokens | ✅ |
+| **Google Gemini** | `gemini-3.1-flash-lite` | ✅ | ✅ | ~$0.10/1M tokens | ✅ |
 | **Groq** | `llama-3.3-70b-versatile` | ❌ | ✅ | ~$0.59/1M tokens | |
 | **OpenAI** | `gpt-4o-mini` | ✅ | ✅ | ~$0.15/1M tokens | |
 
@@ -119,8 +121,9 @@ HEADLESS=false          # Set to true for headless mode
 BROWSER_TYPE=chromium   # chromium, firefox, or webkit
 
 # Agent settings
-TARGET_URL=https://ui.shadcn.com/docs/forms/react-hook-form
 MAX_ITERATIONS=25
+# Smart rate limit delay (in ms) to avoid API quota errors (Gemini free tier)
+RATE_LIMIT_DELAY_MS=4200
 ```
 
 ### Run the Agent
